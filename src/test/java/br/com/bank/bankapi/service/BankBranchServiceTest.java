@@ -2,6 +2,7 @@ package br.com.bank.bankapi.service;
 
 import br.com.bank.bankapi.data.model.BankBranch;
 import br.com.bank.bankapi.repository.BankBranchRepository;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.MalformedParametersException;
@@ -14,14 +15,18 @@ import static org.mockito.Mockito.verify;
 
 class BankBranchServiceTest {
 
-    private BankBranchService bankBranchService;
-    private BankBranchRepository mockedRepository;
+    static private BankBranchService bankBranchService;
+    static private BankBranchRepository mockedRepository;
+
+    @BeforeAll
+    static void setUp() {
+        mockedRepository = mock(BankBranchRepository.class);
+        bankBranchService = new BankBranchService(mockedRepository);
+    }
 
     @Test
     void shouldCreateBankBranch() {
         // Given:
-        mockedRepository = mock(BankBranchRepository.class);
-        bankBranchService = new BankBranchService(mockedRepository);
         BankBranch fakeBankBranch = createFakeBankBranch();
 
         // When:
@@ -34,8 +39,6 @@ class BankBranchServiceTest {
     @Test
     void shouldCreateBranchIfNoAddress() {
         //Given:
-        mockedRepository = mock(BankBranchRepository.class);
-        bankBranchService = new BankBranchService(mockedRepository);
         BankBranch fakeBankBranch = createFakeBankBranch();
         fakeBankBranch.setAddress("");
 
@@ -49,8 +52,6 @@ class BankBranchServiceTest {
     @Test
     void shouldNotCreateBranchIfNoName() {
         //Given:
-        mockedRepository = mock(BankBranchRepository.class);
-        bankBranchService = new BankBranchService(mockedRepository);
         BankBranch fakeBankBranch = createFakeBankBranch();
         fakeBankBranch.setName("");
 

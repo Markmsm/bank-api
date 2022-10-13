@@ -37,7 +37,7 @@ class BankBranchServiceTest {
     }
 
     @Test
-    void shouldCreateBranchIfNoAddress() {
+    void shouldCreateBankBranchIfEmptyAddress() {
         //Given:
         BankBranch fakeBankBranch = createFakeBankBranch();
         fakeBankBranch.setAddress("");
@@ -50,10 +50,38 @@ class BankBranchServiceTest {
     }
 
     @Test
-    void shouldNotCreateBranchIfNoName() {
+    void shouldCreateBankBranchIfNullAddress() {
+        //Given:
+        BankBranch fakeBankBranch = createFakeBankBranch();
+        fakeBankBranch.setAddress(null);
+
+        //When:
+        bankBranchService.create(fakeBankBranch);
+
+        //Then:
+        verify(mockedRepository).create(fakeBankBranch);
+    }
+
+    @Test
+    void shouldNotCreateBankBranchIfEmptyName() {
         //Given:
         BankBranch fakeBankBranch = createFakeBankBranch();
         fakeBankBranch.setName("");
+
+        //When:
+        Throwable ex = assertThrows(MalformedParametersException.class, () -> {
+            bankBranchService.create(fakeBankBranch);
+        });
+
+        //Then:
+        assertThat(ex.getMessage(), is("No name provided."));
+    }
+
+    @Test
+    void shouldNotCreateBankBranchIfNullName() {
+        //Given:
+        BankBranch fakeBankBranch = createFakeBankBranch();
+        fakeBankBranch.setName(null);
 
         //When:
         Throwable ex = assertThrows(MalformedParametersException.class, () -> {

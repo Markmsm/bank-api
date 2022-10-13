@@ -14,10 +14,12 @@ public class BankBranchService {
     }
 
     public void create(BankBranch bankBranch) {
-        if (bankBranch.getName().isBlank()) {
-            throw new MalformedParametersException("No name provided.");
+        String emptyNameMessage = "No name provided.";
+        try {
+            if (bankBranch.getName().isBlank()) throw new MalformedParametersException(emptyNameMessage);
+            repository.create(bankBranch);
+        } catch (NullPointerException ex) {
+            throw new MalformedParametersException(emptyNameMessage);
         }
-
-        repository.create(bankBranch);
     }
 }

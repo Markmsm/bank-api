@@ -6,10 +6,13 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.MalformedParametersException;
+import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
@@ -25,7 +28,7 @@ class BankBranchServiceTest {
     }
 
     @Test
-    void shouldCreateBankBranch() {
+    void createShouldCreateBankBranch() {
         // Given:
         BankBranch fakeBankBranch = createFakeBankBranch();
 
@@ -37,7 +40,7 @@ class BankBranchServiceTest {
     }
 
     @Test
-    void shouldCreateBankBranchIfEmptyAddress() {
+    void createShouldCreateBankBranchIfEmptyAddress() {
         //Given:
         BankBranch fakeBankBranch = createFakeBankBranch();
         fakeBankBranch.setAddress("");
@@ -50,7 +53,7 @@ class BankBranchServiceTest {
     }
 
     @Test
-    void shouldCreateBankBranchIfNullAddress() {
+    void createShouldCreateBankBranchIfNullAddress() {
         //Given:
         BankBranch fakeBankBranch = createFakeBankBranch();
         fakeBankBranch.setAddress(null);
@@ -63,33 +66,50 @@ class BankBranchServiceTest {
     }
 
     @Test
-    void shouldNotCreateBankBranchIfEmptyName() {
+    void createShouldNotCreateBankBranchIfEmptyName() {
         //Given:
         BankBranch fakeBankBranch = createFakeBankBranch();
         fakeBankBranch.setName("");
 
         //When:
-        Throwable ex = assertThrows(MalformedParametersException.class, () -> {
-            bankBranchService.create(fakeBankBranch);
-        });
+        Throwable ex = assertThrows(MalformedParametersException.class, () -> bankBranchService.create(fakeBankBranch));
 
         //Then:
         assertThat(ex.getMessage(), is("No name provided."));
     }
 
     @Test
-    void shouldNotCreateBankBranchIfNullName() {
+    void createShouldNotCreateBankBranchIfNullName() {
         //Given:
         BankBranch fakeBankBranch = createFakeBankBranch();
         fakeBankBranch.setName(null);
 
         //When:
-        Throwable ex = assertThrows(MalformedParametersException.class, () -> {
-            bankBranchService.create(fakeBankBranch);
-        });
+        Throwable ex = assertThrows(MalformedParametersException.class, () -> bankBranchService.create(fakeBankBranch));
 
         //Then:
         assertThat(ex.getMessage(), is("No name provided."));
+    }
+
+    //Todo: revisar este teste quando aplicação tiver conexão com o banco,
+    // pois neste momento não está testando lógica nenhuma,
+    // o mock está retornando o próprio objeto que o teste usa, ou seja,
+    // só valida se ele retorna o que o repository retornou pra ele (fiz mais pela experiencia mesmo)
+    @Test
+    void getShouldReturnBankBranchById() {
+        //Given:
+        BankBranch expectedBankBranch = createFakeBankBranch();
+        given(mockedRepository.get(expectedBankBranch.getId())).willReturn(Optional.of(expectedBankBranch));
+
+        //When:
+        Optional<BankBranch> bankBranchOPT = bankBranchService.get(expectedBankBranch.getId());
+        BankBranch bankBranch = bankBranchOPT.orElse(null);
+
+        //Then:
+        assertThat(bankBranch, notNullValue());
+        assertThat(bankBranch.getId(), is(expectedBankBranch.getId()));
+        assertThat(bankBranch.getName(), is(expectedBankBranch.getName()));
+        assertThat(bankBranch.getAddress(), is(expectedBankBranch.getAddress()));
     }
 
     BankBranch createFakeBankBranch() {

@@ -4,6 +4,7 @@ import br.com.bank.bankapi.data.model.BankBranch;
 import br.com.bank.bankapi.repository.BankBranchRepository;
 
 import java.lang.reflect.MalformedParametersException;
+import java.util.Optional;
 
 public class BankBranchService {
 
@@ -21,5 +22,9 @@ public class BankBranchService {
         } catch (NullPointerException ex) {
             throw new MalformedParametersException(emptyNameMessage);
         }
+    }
+
+    public Optional<BankBranch> get(int bankBranchId) {
+        return repository.get(bankBranchId);
     }
 }

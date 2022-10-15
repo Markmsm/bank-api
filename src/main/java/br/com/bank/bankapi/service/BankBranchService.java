@@ -4,6 +4,7 @@ import br.com.bank.bankapi.data.model.BankBranch;
 import br.com.bank.bankapi.repository.BankBranchRepository;
 
 import java.lang.reflect.MalformedParametersException;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 public class BankBranchService {
@@ -24,12 +25,17 @@ public class BankBranchService {
         }
     }
 
-    public Optional<BankBranch> get(int bankBranchId) {
-        return repository.get(bankBranchId);
+    public BankBranch get(int bankBranchId) {
+        Optional<BankBranch> bankBranchOPT = repository.get(bankBranchId);
+        if (bankBranchOPT.isPresent()) {
+            return bankBranchOPT.get();
+        } else {
+            throw new NoSuchElementException(String.format("Bank branch id = %s not found.", bankBranchId));
+        }
     }
 
     public void delete(int bankBranchId) {
-        Optional<BankBranch> bankBranchToDeleteOPT = get(bankBranchId);
-        bankBranchToDeleteOPT.ifPresent(bankBranch -> repository.delete(bankBranch));
+        BankBranch bankBranchToDelete = get(bankBranchId);
+        repository.delete(bankBranchToDelete);
     }
 }

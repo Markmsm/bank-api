@@ -6,11 +6,11 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.MalformedParametersException;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
@@ -102,14 +102,24 @@ class BankBranchServiceTest {
         given(mockedRepository.get(expectedBankBranch.getId())).willReturn(Optional.of(expectedBankBranch));
 
         //When:
-        Optional<BankBranch> bankBranchOPT = bankBranchService.get(expectedBankBranch.getId());
-        BankBranch bankBranch = bankBranchOPT.orElse(null);
+        BankBranch bankBranch = bankBranchService.get(expectedBankBranch.getId());
 
         //Then:
-        assertThat(bankBranch, notNullValue());
         assertThat(bankBranch.getId(), is(expectedBankBranch.getId()));
         assertThat(bankBranch.getName(), is(expectedBankBranch.getName()));
         assertThat(bankBranch.getAddress(), is(expectedBankBranch.getAddress()));
+    }
+
+    @Test
+    void getShouldThrowExceptionIfNoBankBranch() {
+        //Given:
+        int fakeBankBranchId = createFakeBankBranch().getId();
+
+        //When:
+        Throwable ex = assertThrows(NoSuchElementException.class, () -> bankBranchService.get(fakeBankBranchId));
+
+        //Then:
+        assertThat(ex.getMessage(), is(String.format("Bank branch id = %s not found.", fakeBankBranchId)));
     }
 
     @Test

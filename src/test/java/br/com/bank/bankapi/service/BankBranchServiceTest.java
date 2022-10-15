@@ -112,6 +112,19 @@ class BankBranchServiceTest {
         assertThat(bankBranch.getAddress(), is(expectedBankBranch.getAddress()));
     }
 
+    @Test
+    void deleteShouldDeleteBankBranch() {
+        //Given:
+        BankBranch bankBranchToDelete = createFakeBankBranch();
+        given(mockedRepository.get(bankBranchToDelete.getId())).willReturn(Optional.of(bankBranchToDelete));
+
+        //When:
+        bankBranchService.delete(bankBranchToDelete.getId());
+
+        //Then:
+        verify(mockedRepository).delete(bankBranchToDelete);
+    }
+
     BankBranch createFakeBankBranch() {
         return new BankBranch("Branch testeeeera", "Address testeeeeraaa");
     }

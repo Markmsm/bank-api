@@ -19,4 +19,8 @@ public class BankBranchRepository {
                 .filter(b -> b.getId() == bankBranchId)
                 .findAny();
     }
+
+    public void delete(BankBranch bankBranch) {
+        bankBranches.remove(bankBranch);
+    }
 }

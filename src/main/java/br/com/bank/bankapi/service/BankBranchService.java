@@ -27,4 +27,9 @@ public class BankBranchService {
     public Optional<BankBranch> get(int bankBranchId) {
         return repository.get(bankBranchId);
     }
+
+    public void delete(int bankBranchId) {
+        Optional<BankBranch> bankBranchToDeleteOPT = get(bankBranchId);
+        bankBranchToDeleteOPT.ifPresent(bankBranch -> repository.delete(bankBranch));
+    }
 }

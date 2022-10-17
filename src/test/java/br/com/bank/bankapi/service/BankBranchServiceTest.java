@@ -135,6 +135,18 @@ class BankBranchServiceTest {
         verify(mockedRepository).delete(bankBranchToDelete);
     }
 
+    @Test
+    void deleteShouldThrowExceptionIfNoBankBranch() {
+        //Given:
+        BankBranch bankBranchToDelete = createFakeBankBranch();
+
+        //When:
+        Throwable ex = assertThrows(NoSuchElementException.class, () -> bankBranchService.delete(bankBranchToDelete.getId()));
+
+        //Then:
+        assertThat(ex.getMessage(), is(String.format("Bank branch id = %s not found.", bankBranchToDelete.getId())));
+    }
+
     BankBranch createFakeBankBranch() {
         return new BankBranch("Branch testeeeera", "Address testeeeeraaa");
     }

@@ -66,7 +66,7 @@ class BankBranchServiceTest {
     }
 
     @Test
-    void createShouldNotCreateBankBranchIfEmptyName() {
+    void createShouldThrowExceptionIfBankBranchWithEmptyName() {
         //Given:
         BankBranch fakeBankBranch = createFakeBankBranch();
         fakeBankBranch.setName("");
@@ -79,7 +79,7 @@ class BankBranchServiceTest {
     }
 
     @Test
-    void createShouldNotCreateBankBranchIfNullName() {
+    void createShouldThrowExceptionIfBankBranchWithNullName() {
         //Given:
         BankBranch fakeBankBranch = createFakeBankBranch();
         fakeBankBranch.setName(null);

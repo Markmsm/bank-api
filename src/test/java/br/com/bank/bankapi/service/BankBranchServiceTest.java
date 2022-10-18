@@ -185,13 +185,12 @@ class BankBranchServiceTest {
         assertThat(ex.getMessage(), is(String.format("Bank branch id = %s not found.", bankBranchToDelete.getId())));
     }
 
-    //Todo: Rever este teste
     @Test
     void createAccountShouldCreateAccount() {
         //Given:
         BankBranch fakeBankBranch = createFakeBankBranch();
         Account fakeAccount = createFakeAccount();
-        fakeBankBranch.setId(fakeAccount.getId());
+        fakeBankBranch.setId(fakeAccount.getBankBranchId());
         given(mockedRepository
                 .get(fakeAccount.getBankBranchId()))
                 .willReturn(Optional.of(fakeBankBranch));
@@ -202,6 +201,21 @@ class BankBranchServiceTest {
         //Then:
         verify(mockedRepository).delete(fakeBankBranch);
         verify(mockedRepository).create(fakeBankBranch);
+    }
+
+    @Test
+    void createAccountShouldThrowExceptionIfNoBankBranch() {
+        //Given:
+        BankBranch fakeBankBranch = createFakeBankBranch();
+        Account fakeAccount = createFakeAccount();
+        fakeBankBranch.setId(fakeAccount.getBankBranchId());
+
+        //When:
+        Throwable ex = assertThrows(NoSuchElementException.class,
+                () -> bankBranchService.createAccount(fakeAccount));
+
+        //Then:
+        assertThat(ex.getMessage(), is(String.format("Bank branch id = %s not found.", fakeBankBranch.getId())));
     }
 
     BankBranch createFakeBankBranch() {

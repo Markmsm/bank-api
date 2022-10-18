@@ -48,7 +48,6 @@ public class BankBranchService {
     public void createAccount(Account account) {
         BankBranch bankBranch = get(account.getBankBranchId());
         bankBranch.addAccount(account);
-        repository.delete(bankBranch);
-        create(bankBranch);
+        update(bankBranch);
     }
 }

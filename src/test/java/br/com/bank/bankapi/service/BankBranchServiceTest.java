@@ -128,6 +128,37 @@ class BankBranchServiceTest {
     }
 
     @Test
+    void updateShouldUpdateBankBranch() {
+        //Given:
+        BankBranch oldBankBranch = createFakeBankBranch();
+        BankBranch newBankBranch = createFakeBankBranch();
+        newBankBranch.setId(oldBankBranch.getId());
+        newBankBranch.setName("Testeeera");
+        given(mockedRepository.get(oldBankBranch.getId()))
+                .willReturn(Optional.of(oldBankBranch));
+
+        //When:
+        bankBranchService.update(newBankBranch);
+
+        //Then:
+        verify(mockedRepository).delete(oldBankBranch);
+        verify(mockedRepository).create(newBankBranch);
+    }
+
+    @Test
+    void updateShouldThrowExceptionIfNoBankBranch() {
+        //Given:
+        BankBranch fakeBankBranch = createFakeBankBranch();
+
+        //When:
+        Throwable ex = assertThrows(NoSuchElementException.class,
+                () -> bankBranchService.update(fakeBankBranch));
+
+        //Then:
+        assertThat(ex.getMessage(), is(String.format("Bank branch id = %s not found.", fakeBankBranch.getId())));
+    }
+
+    @Test
     void deleteShouldDeleteBankBranch() {
         //Given:
         BankBranch bankBranchToDelete = createFakeBankBranch();
@@ -152,24 +183,6 @@ class BankBranchServiceTest {
 
         //Then:
         assertThat(ex.getMessage(), is(String.format("Bank branch id = %s not found.", bankBranchToDelete.getId())));
-    }
-
-    @Test
-    void updateShouldUpdateBankBranch() {
-        //Given:
-        BankBranch oldBankBranch = createFakeBankBranch();
-        BankBranch newBankBranch = createFakeBankBranch();
-        newBankBranch.setId(oldBankBranch.getId());
-        newBankBranch.setName("Testeeera");
-        given(mockedRepository.get(oldBankBranch.getId()))
-                .willReturn(Optional.of(oldBankBranch));
-
-        //When:
-        bankBranchService.update(newBankBranch);
-
-        //Then:
-        verify(mockedRepository).delete(oldBankBranch);
-        verify(mockedRepository).create(newBankBranch);
     }
 
     //Todo: Rever este teste

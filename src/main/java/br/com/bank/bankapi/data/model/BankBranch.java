@@ -14,10 +14,15 @@ public class BankBranch {
         id = new Random().nextInt(10000) + 1;
         this.name = name;
         this.address = address;
+        accounts = new ArrayList<>();
     }
 
     public int getId() {
         return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getName() {
@@ -34,5 +39,9 @@ public class BankBranch {
 
     public void setAddress(String address) {
         this.address = address;
+    }
+
+    public void addAccount(Account account) {
+        accounts.add(account);
     }
 }

@@ -1,5 +1,6 @@
 package br.com.bank.bankapi.service;
 
+import br.com.bank.bankapi.data.model.Account;
 import br.com.bank.bankapi.data.model.BankBranch;
 import br.com.bank.bankapi.repository.BankBranchRepository;
 
@@ -37,5 +38,12 @@ public class BankBranchService {
     public void delete(int bankBranchId) {
         BankBranch bankBranchToDelete = get(bankBranchId);
         repository.delete(bankBranchToDelete);
+    }
+
+    public void createAccount(Account account) {
+        BankBranch bankBranch = get(account.getBankBranchId());
+        bankBranch.addAccount(account);
+        repository.delete(bankBranch);
+        create(bankBranch);
     }
 }

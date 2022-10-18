@@ -35,6 +35,11 @@ public class BankBranchService {
         }
     }
 
+    public void update(BankBranch bankBranch) {
+        delete(bankBranch.getId());
+        create(bankBranch);
+    }
+
     public void delete(int bankBranchId) {
         BankBranch bankBranchToDelete = get(bankBranchId);
         repository.delete(bankBranchToDelete);

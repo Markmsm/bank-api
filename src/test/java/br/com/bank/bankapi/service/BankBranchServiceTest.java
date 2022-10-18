@@ -102,8 +102,7 @@ class BankBranchServiceTest {
     void getShouldReturnBankBranchById() {
         //Given:
         BankBranch expectedBankBranch = createFakeBankBranch();
-        given(mockedRepository
-                .get(expectedBankBranch.getId()))
+        given(mockedRepository.get(expectedBankBranch.getId()))
                 .willReturn(Optional.of(expectedBankBranch));
 
         //When:
@@ -132,8 +131,7 @@ class BankBranchServiceTest {
     void deleteShouldDeleteBankBranch() {
         //Given:
         BankBranch bankBranchToDelete = createFakeBankBranch();
-        given(mockedRepository
-                .get(bankBranchToDelete.getId()))
+        given(mockedRepository.get(bankBranchToDelete.getId()))
                 .willReturn(Optional.of(bankBranchToDelete));
 
         //When:
@@ -156,6 +154,25 @@ class BankBranchServiceTest {
         assertThat(ex.getMessage(), is(String.format("Bank branch id = %s not found.", bankBranchToDelete.getId())));
     }
 
+    @Test
+    void updateShouldUpdateBankBranch() {
+        //Given:
+        BankBranch oldBankBranch = createFakeBankBranch();
+        BankBranch newBankBranch = createFakeBankBranch();
+        newBankBranch.setId(oldBankBranch.getId());
+        newBankBranch.setName("Testeeera");
+        given(mockedRepository.get(oldBankBranch.getId()))
+                .willReturn(Optional.of(oldBankBranch));
+
+        //When:
+        bankBranchService.update(newBankBranch);
+
+        //Then:
+        verify(mockedRepository).delete(oldBankBranch);
+        verify(mockedRepository).create(newBankBranch);
+    }
+
+    //Todo: Rever este teste
     @Test
     void createAccountShouldCreateAccount() {
         //Given:

@@ -3,7 +3,7 @@ package br.com.bank.bankapi.service;
 import br.com.bank.bankapi.data.model.Account;
 import br.com.bank.bankapi.data.model.BankBranch;
 import br.com.bank.bankapi.repository.BankBranchRepository;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.MalformedParametersException;
@@ -22,8 +22,8 @@ class BankBranchServiceTest {
     static private BankBranchService bankBranchService;
     static private BankBranchRepository mockedRepository;
 
-    @BeforeAll
-    static void setUp() {
+    @BeforeEach
+    void setUp() {
         mockedRepository = mock(BankBranchRepository.class);
         bankBranchService = new BankBranchService(mockedRepository);
     }
@@ -115,7 +115,7 @@ class BankBranchServiceTest {
     }
 
     @Test
-    void getShouldThrowExceptionIfNoBankBranch() {
+    void getShouldThrowExceptionIfBankBranchDontExist() {
         //Given:
         int fakeBankBranchId = createFakeBankBranch().getId();
 
@@ -146,7 +146,7 @@ class BankBranchServiceTest {
     }
 
     @Test
-    void updateShouldThrowExceptionIfNoBankBranch() {
+    void updateShouldThrowExceptionIfBankBranchDontExist() {
         //Given:
         BankBranch fakeBankBranch = createFakeBankBranch();
 
@@ -173,7 +173,7 @@ class BankBranchServiceTest {
     }
 
     @Test
-    void deleteShouldThrowExceptionIfNoBankBranch() {
+    void deleteShouldThrowExceptionIfBankBranchDontExist() {
         //Given:
         BankBranch bankBranchToDelete = createFakeBankBranch();
 
@@ -204,7 +204,7 @@ class BankBranchServiceTest {
     }
 
     @Test
-    void createAccountShouldThrowExceptionIfNoBankBranch() {
+    void createAccountShouldThrowExceptionIfBankBranchDontExist() {
         //Given:
         BankBranch fakeBankBranch = createFakeBankBranch();
         Account fakeAccount = createFakeAccount();
@@ -216,6 +216,47 @@ class BankBranchServiceTest {
 
         //Then:
         assertThat(ex.getMessage(), is(String.format("Bank branch id = %s not found.", fakeBankBranch.getId())));
+    }
+
+    @Test
+    void getAccountShouldReturnAccount() {
+        //Given:
+        Account fakeAccount = createFakeAccount();
+        BankBranch fakeBankBranch = createFakeBankBranch();
+        fakeBankBranch.setId(fakeAccount.getBankBranchId());
+        fakeBankBranch.addAccount(fakeAccount);
+        given(mockedRepository.get(fakeAccount.getBankBranchId()))
+                .willReturn(Optional.of(fakeBankBranch));
+
+        //When:
+        bankBranchService.getAccount(fakeAccount.getId(), fakeAccount.getBankBranchId());
+
+        //Then:
+        verify(mockedRepository).get(fakeAccount.getBankBranchId());
+    }
+
+    @Test
+    void getAccountShouldThrowExceptionIfAccountDontExist() {
+        //Given:
+        Account fakeAccount = createFakeAccount();
+        BankBranch fakeBankBranch = createFakeBankBranch();
+        fakeBankBranch.setId(fakeAccount.getBankBranchId());
+        given(mockedRepository.get(fakeAccount.getBankBranchId()))
+                .willReturn(Optional.of(fakeBankBranch));
+
+        //When:
+        Throwable ex = assertThrows(NoSuchElementException.class,
+                () -> bankBranchService.getAccount(fakeAccount.getId(), fakeAccount.getBankBranchId()));
+
+        //Then:
+        assertThat(
+                ex.getMessage(),
+                is(String.format(
+                        "Account id = %s in bank branch id = %s not found.",
+                        fakeAccount.getId(),
+                        fakeAccount.getBankBranchId()
+                ))
+        );
     }
 
     BankBranch createFakeBankBranch() {

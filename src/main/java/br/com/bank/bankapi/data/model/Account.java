@@ -6,6 +6,7 @@ import java.util.Random;
 public class Account {
     private int id;
     private ArrayList<Customer> accountOwners;
+    private double balance;
     private int bankBranchId;
 
     public Account(int bankBranchId) {
@@ -19,6 +20,14 @@ public class Account {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public double getBalance() {
+        return balance;
+    }
+
+    public void setBalance(double balance) {
+        this.balance = balance;
     }
 
     public int getBankBranchId() {

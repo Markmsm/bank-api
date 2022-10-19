@@ -50,4 +50,18 @@ public class BankBranchService {
         bankBranch.addAccount(account);
         update(bankBranch);
     }
+
+    public Account getAccount(int accountId, int bankBranchId) {
+        BankBranch bankBranch = get(bankBranchId);
+        Optional<Account> accountOPT = bankBranch.getAccounts()
+                .stream()
+                .filter(a -> a.getId() == accountId)
+                .findAny();
+
+        if (accountOPT.isPresent()) {
+            return accountOPT.get();
+        } else {
+            throw new NoSuchElementException(String.format("Account id = %s in bank branch id = %s not found.", accountId, bankBranchId));
+        }
+    }
 }

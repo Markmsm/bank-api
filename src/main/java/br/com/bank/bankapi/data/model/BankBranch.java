@@ -44,4 +44,8 @@ public class BankBranch {
     public void addAccount(Account account) {
         accounts.add(account);
     }
+
+    public ArrayList<Account> getAccounts() {
+        return accounts;
+    }
 }

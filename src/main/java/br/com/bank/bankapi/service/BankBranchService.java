@@ -2,9 +2,13 @@ package br.com.bank.bankapi.service;
 
 import br.com.bank.bankapi.data.model.Account;
 import br.com.bank.bankapi.data.model.BankBranch;
+import br.com.bank.bankapi.data.model.Customer;
 import br.com.bank.bankapi.repository.BankBranchRepository;
 
+import javax.naming.directory.InvalidAttributesException;
 import java.lang.reflect.MalformedParametersException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
@@ -36,8 +40,9 @@ public class BankBranchService {
     }
 
     public void update(BankBranch bankBranch) {
+        BankBranch newBankBranch = cloneBankBranch(bankBranch);
         delete(bankBranch.getId());
-        create(bankBranch);
+        create(newBankBranch);
     }
 
     public void delete(int bankBranchId) {
@@ -45,10 +50,18 @@ public class BankBranchService {
         repository.delete(bankBranchToDelete);
     }
 
-    public void createAccount(Account account) {
-        BankBranch bankBranch = get(account.getBankBranchId());
-        bankBranch.addAccount(account);
-        update(bankBranch);
+    public void createAccount(int bankBranchId, List<Customer> customers) throws InvalidAttributesException {
+        if (customers == null || customers.isEmpty())
+            throw new InvalidAttributesException(String.format(
+                    "Account for bank branch id = %s could not be created without customer.",
+                    bankBranchId
+            ));
+
+        BankBranch oldBankBranch = get(bankBranchId);
+        BankBranch newBankBranch = cloneBankBranch(oldBankBranch);
+        Account newAccount = new Account(bankBranchId, customers);
+        newBankBranch.addAccount(newAccount);
+        update(newBankBranch);
     }
 
     public Account getAccount(int accountId, int bankBranchId) {
@@ -63,5 +76,12 @@ public class BankBranchService {
         } else {
             throw new NoSuchElementException(String.format("Account id = %s in bank branch id = %s not found.", accountId, bankBranchId));
         }
+    }
+
+    private BankBranch cloneBankBranch(BankBranch bankBranch) {
+        return new BankBranch(bankBranch.getId(),
+                bankBranch.getName(),
+                bankBranch.getAddress(),
+                new ArrayList<>(bankBranch.getAccounts()));
     }
 }

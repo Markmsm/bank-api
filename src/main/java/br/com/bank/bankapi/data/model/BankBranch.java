@@ -1,6 +1,7 @@
 package br.com.bank.bankapi.data.model;
 
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.Random;
 
 public class BankBranch {
@@ -15,6 +16,13 @@ public class BankBranch {
         this.name = name;
         this.address = address;
         accounts = new ArrayList<>();
+    }
+
+    public BankBranch(int id, String name, String address, ArrayList<Account> accounts) {
+        this.id = id;
+        this.name = name;
+        this.address = address;
+        this.accounts = accounts;
     }
 
     public int getId() {
@@ -45,7 +53,24 @@ public class BankBranch {
         accounts.add(account);
     }
 
+    public void setAccounts(ArrayList<Account> accounts) {
+        this.accounts = accounts;
+    }
+
     public ArrayList<Account> getAccounts() {
         return accounts;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        BankBranch that = (BankBranch) o;
+        return id == that.id && name.equals(that.name) && Objects.equals(address, that.address) && Objects.equals(accounts, that.accounts);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, address, accounts);
     }
 }

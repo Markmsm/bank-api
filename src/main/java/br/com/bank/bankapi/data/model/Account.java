@@ -1,17 +1,18 @@
 package br.com.bank.bankapi.data.model;
 
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 public class Account {
     private int id;
-    private ArrayList<Customer> accountOwners;
+    private List<Customer> accountOwners;
     private double balance;
     private int bankBranchId;
 
-    public Account(int bankBranchId) {
+    public Account(int bankBranchId, List<Customer> customers) {
         id = new Random().nextInt(10000) + 1;
         this.bankBranchId = bankBranchId;
+        accountOwners = customers;
     }
 
     public int getId() {

@@ -2,11 +2,15 @@ package br.com.bank.bankapi.service;
 
 import br.com.bank.bankapi.data.model.Account;
 import br.com.bank.bankapi.data.model.BankBranch;
+import br.com.bank.bankapi.data.model.Customer;
 import br.com.bank.bankapi.repository.BankBranchRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import javax.naming.directory.InvalidAttributesException;
 import java.lang.reflect.MalformedParametersException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
@@ -132,9 +136,10 @@ class BankBranchServiceTest {
         //Given:
         BankBranch oldBankBranch = createFakeBankBranch();
         BankBranch newBankBranch = createFakeBankBranch();
-        newBankBranch.setId(oldBankBranch.getId());
+        int oldBankBranchId = oldBankBranch.getId();
+        newBankBranch.setId(oldBankBranchId);
         newBankBranch.setName("Testeeera");
-        given(mockedRepository.get(oldBankBranch.getId()))
+        given(mockedRepository.get(oldBankBranchId))
                 .willReturn(Optional.of(oldBankBranch));
 
         //When:
@@ -148,14 +153,16 @@ class BankBranchServiceTest {
     @Test
     void updateShouldThrowExceptionIfBankBranchDontExist() {
         //Given:
-        BankBranch fakeBankBranch = createFakeBankBranch();
+        int oldBankBranchId = createFakeBankBranch().getId();
+        BankBranch newBankBranch = createFakeBankBranch();
+        newBankBranch.setId(oldBankBranchId);
 
         //When:
         Throwable ex = assertThrows(NoSuchElementException.class,
-                () -> bankBranchService.update(fakeBankBranch));
+                () -> bankBranchService.update(newBankBranch));
 
         //Then:
-        assertThat(ex.getMessage(), is(String.format("Bank branch id = %s not found.", fakeBankBranch.getId())));
+        assertThat(ex.getMessage(), is(String.format("Bank branch id = %s not found.", newBankBranch.getId())));
     }
 
     @Test
@@ -186,36 +193,68 @@ class BankBranchServiceTest {
     }
 
     @Test
-    void createAccountShouldCreateAccount() {
+    void createAccountShouldCreateAccount() throws InvalidAttributesException {
         //Given:
-        BankBranch fakeBankBranch = createFakeBankBranch();
-        Account fakeAccount = createFakeAccount();
-        fakeBankBranch.setId(fakeAccount.getBankBranchId());
+        List<Customer> customers = createFakeCustomers();
+        BankBranch fakeBankBranchWithoutAccount = createFakeBankBranch();
+//        BankBranch expectedBankBranchWithAccount = createFakeBankBranch();
+//        expectedBankBranchWithAccount.setId(fakeBankBranchWithoutAccount.getId());
         given(mockedRepository
-                .get(fakeAccount.getBankBranchId()))
-                .willReturn(Optional.of(fakeBankBranch));
+                .get(fakeBankBranchWithoutAccount.getId()))
+                .willReturn(Optional.of(fakeBankBranchWithoutAccount));
 
         //When:
-        bankBranchService.createAccount(fakeAccount);
+        bankBranchService.createAccount(fakeBankBranchWithoutAccount.getId(), customers);
 
         //Then:
-        verify(mockedRepository).delete(fakeBankBranch);
-        verify(mockedRepository).create(fakeBankBranch);
+        verify(mockedRepository).delete(fakeBankBranchWithoutAccount);
+        //Todo COMO VERIFICAR SE O MÉTODO CREATE FOI CHAMADO COM A AGÊNCIA CONTENDO CONTA??????
     }
 
     @Test
     void createAccountShouldThrowExceptionIfBankBranchDontExist() {
         //Given:
-        BankBranch fakeBankBranch = createFakeBankBranch();
-        Account fakeAccount = createFakeAccount();
-        fakeBankBranch.setId(fakeAccount.getBankBranchId());
+        List<Customer> customers = createFakeCustomers();
+        int fakeBankBranchId = createFakeBankBranch().getId();
 
         //When:
         Throwable ex = assertThrows(NoSuchElementException.class,
-                () -> bankBranchService.createAccount(fakeAccount));
+                () -> bankBranchService.createAccount(fakeBankBranchId, customers));
 
         //Then:
-        assertThat(ex.getMessage(), is(String.format("Bank branch id = %s not found.", fakeBankBranch.getId())));
+        assertThat(ex.getMessage(), is(String.format("Bank branch id = %s not found.", fakeBankBranchId)));
+    }
+
+    @Test
+    void createAccountShouldThrowExceptionIfEmptyCustomers() {
+        //Given:
+        List<Customer> customers = createFakeCustomers();
+        int fakeBankBranchId = createFakeBankBranch().getId();
+        customers.clear();
+
+        //When:
+        Throwable ex = assertThrows(InvalidAttributesException.class,
+                () -> bankBranchService.createAccount(fakeBankBranchId, customers));
+
+        //Then:
+        assertThat(ex.getMessage(),
+                is(String.format("Account for bank branch id = %s could not be created without customer.",
+                        fakeBankBranchId)));
+    }
+
+    @Test
+    void createAccountShouldThrowExceptionIfNullCustomers() {
+        //Given:
+        int fakeBankBranchId = createFakeBankBranch().getId();
+
+        //When:
+        Throwable ex = assertThrows(InvalidAttributesException.class,
+                () -> bankBranchService.createAccount(fakeBankBranchId, null));
+
+        //Then:
+        assertThat(ex.getMessage(),
+                is(String.format("Account for bank branch id = %s could not be created without customer.",
+                        fakeBankBranchId)));
     }
 
     @Test
@@ -263,7 +302,20 @@ class BankBranchServiceTest {
         return new BankBranch("Branch testeeeera", "Address testeeeeraaa");
     }
 
+    private List<Customer> createFakeCustomers() {
+        List<Customer> customers = new ArrayList<>();
+
+        Customer johnDoe = new Customer("12345678912",
+                "John Doe",
+                "John Doe Address",
+                "5551999999999",
+                "john@email.com");
+
+        customers.add(johnDoe);
+        return customers;
+    }
+
     Account createFakeAccount() {
-        return new Account(123456);
+        return new Account(123456, createFakeCustomers());
     }
 }
